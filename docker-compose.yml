@@ -19,8 +19,11 @@ services:
     container_name: cctrack
     ports:
       - '3000:3000'
+    volumes:
+      - ./:/home/node/app
     depends_on:
       - cctrack_db
+    command: npm run dev -- --port 3000 --host
     restart: unless-stopped
 
   cctrack_db:

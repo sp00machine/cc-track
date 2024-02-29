@@ -25,17 +25,20 @@ ENV ORIGIN $ORIGIN
 ENV TZ $TZ
 
 # Install node dependencies
-WORKDIR /svelte
+RUN npm install -g pnpm
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
 COPY ./package.json .
-COPY ./svelte.config.js .
 RUN npm install
+# COPY ./svelte.config.js .
 
 # Move to container
-COPY . .
+#COPY . .
 
 # Build for production
-RUN npm run build
+#RUN npm run build
 
 # Launch app
-CMD ["node", "build"]
 EXPOSE 3000
+# CMD ["npm", "run", "dev","--", "--port", "3000", "--host"]
+
