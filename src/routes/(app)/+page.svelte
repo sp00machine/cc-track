@@ -45,6 +45,19 @@
 	let categories = data.stream.categories;
 	let subcategories = data.stream.subcategories;
 
+	//ash stuff
+	let category_width = 0;
+	let category_tick = false;
+	$: if (category_width) {
+		category_tick = !category_tick;
+	}
+
+	let subcategory_width = 0;
+	let subcategory_tick = false;
+	$: if (subcategory_width) {
+		subcategory_tick = !subcategory_tick;
+	}
+
 	async function syncTransactions() {
 		const res = await (
 			await fetch('/api/transactions', {
@@ -221,30 +234,36 @@
 			<PieChartIcon size="18" class="text-muted-foreground" />
 		</Card.Header>
 		<Card.Content>
-			{#await categories}
-				<Skeleton class="w-full h-96 rounded" />
-			{:then categories}
-				{#key categories}
-					<CategoryChart
-						amounts={categories
-							.filter(
-								(category) =>
-									category.category_primary != 'LOAN_PAYMENTS' &&
-									category.category_primary != 'TRANSFER_IN' &&
-									category.category_primary != 'TRANSFER_OUT'
-							)
-							.map((category) => category.amount)}
-						categories={categories
-							.filter(
-								(category) =>
-									category.category_primary != 'LOAN_PAYMENTS' &&
-									category.category_primary != 'TRANSFER_IN' &&
-									category.category_primary != 'TRANSFER_OUT'
-							)
-							.map((category) => formatCategory(category.category_primary))}
-					/>
+			<div bind:clientWidth={category_width}>
+				{#key category_tick}
+					{#await categories}
+						<Skeleton class="w-full h-96 rounded" />
+					{:then categories}
+						{#key categories}
+							<CategoryChart
+								amounts={categories
+									.filter(
+										(category) =>
+											category.category_primary != 'LOAN_PAYMENTS' &&
+											category.category_primary != 'TRANSFER_IN' &&
+											category.category_primary != 'TRANSFER_OUT'
+									)
+									.map((category) => category.amount)}
+								categories={categories
+									.filter(
+										(category) =>
+											category.category_primary != 'LOAN_PAYMENTS' &&
+											category.category_primary != 'TRANSFER_IN' &&
+											category.category_primary != 'TRANSFER_OUT'
+									)
+									.map((category) =>
+										formatCategory(category.category_primary, null, category_width)
+									)}
+							/>
+						{/key}
+					{/await}
 				{/key}
-			{/await}
+			</div>
 		</Card.Content>
 	</Card.Root>
 	<Card.Root>
@@ -253,32 +272,40 @@
 			<PieChartIcon size="18" class="text-muted-foreground" />
 		</Card.Header>
 		<Card.Content>
-			{#await subcategories}
-				<Skeleton class="w-full h-96 rounded" />
-			{:then subcategories}
-				{#key subcategories}
-					<CategoryChart
-						amounts={subcategories
-							.filter(
-								(category) =>
-									category.category_primary != 'LOAN_PAYMENTS' &&
-									category.category_primary != 'TRANSFER_IN' &&
-									category.category_primary != 'TRANSFER_OUT'
-							)
-							.map((subcategory) => subcategory.amount)}
-						categories={subcategories
-							.filter(
-								(category) =>
-									category.category_primary != 'LOAN_PAYMENTS' &&
-									category.category_primary != 'TRANSFER_IN' &&
-									category.category_primary != 'TRANSFER_OUT'
-							)
-							.map((subcategory) =>
-								formatCategory(subcategory.category_detailed, subcategory.category_primary)
-							)}
-					/>
+			<div bind:clientWidth={subcategory_width} class="container">
+				{#key subcategory_tick}
+					{#await subcategories}
+						<Skeleton class="w-full h-96 rounded" />
+					{:then subcategories}
+						{#key subcategories}
+							<CategoryChart
+								amounts={subcategories
+									.filter(
+										(category) =>
+											category.category_primary != 'LOAN_PAYMENTS' &&
+											category.category_primary != 'TRANSFER_IN' &&
+											category.category_primary != 'TRANSFER_OUT'
+									)
+									.map((subcategory) => subcategory.amount)}
+								categories={subcategories
+									.filter(
+										(category) =>
+											category.category_primary != 'LOAN_PAYMENTS' &&
+											category.category_primary != 'TRANSFER_IN' &&
+											category.category_primary != 'TRANSFER_OUT'
+									)
+									.map((subcategory) =>
+										formatCategory(
+											subcategory.category_detailed,
+											subcategory.category_primary,
+											subcategory_width
+										)
+									)}
+							/>
+						{/key}
+					{/await}
 				{/key}
-			{/await}
+			</div>
 		</Card.Content>
 	</Card.Root>
 </div>

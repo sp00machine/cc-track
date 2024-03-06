@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
+import { string } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -68,15 +69,23 @@ export function formatCurrency(num: number | string) {
     });
 }
 
-export function formatCategory(category: string | null, replace: string | null = null) {
+export function formatCategory(category: string | null, replace: string | null = null, width: number | null = null) {
     if (!category) return 'N/A';
     if (replace) {
         category = category.replace(replace + '_', '');
     }
-    return category
+
+    const cat = category
         .split('_')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+        .join(' ')
+
+    // If the formatted category name is too long, we trim it and append '...'
+    if (width) {
+        const cutoff = Math.round((width - 300) / 15) + 10;
+        if (cutoff < cat.length) return cat.substring(0, cutoff) + '...';
+        else return cat;
+    } else return cat;
 }
 
 export function capitalize(s: string) {

@@ -68,8 +68,8 @@
 	});
 
 	onDestroy(() => {
-		apexChart.destroy();
-		smolApexChart.destroy();
+		if (apexChart) apexChart.destroy();
+		if (smolApexChart) smolApexChart.destroy();
 	});
 </script>
 
